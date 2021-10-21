@@ -14,40 +14,30 @@ print('DISPLAY FIRST FIVE RECORDS: \n', heart_disease.head(), '')
 # Get overview of the structure of the data using the shape attribute:
 print('DATA SHAPE: \n', heart_disease.shape, '')
 
-# Summarize the basic information about the data using info() method:
-print('\nSUMMARY OF FILE: \n', heart_disease.info(), '')
+# Create a function to get a summary about the data with all the basic summary statistics
 
-# Display the column labels to check if the column headers are in correct format using the columns attribute:
-print('\nCOLUMNS LIST AND COUNT: \n', heart_disease.columns, '')
+def describe_all(df):
+    print('\nDESCRIPTION OF DATA')
+    for i in df:
+        print('\n', i, '\n', df[i].describe())
+        if df[i].dtype=='object':
+            print("Categories:\n", df[i].value_counts(), '\n')
 
-# Get a summary about the data with all the basic summary statistics using the describe() method for each field:
-print('\nDESCRIPTION OF DATA\n\nAGE: \n Sample data: ', heart_disease['Age'][0], '\n', heart_disease['Age'].describe())
-print('\nSex: \n Sample data: ', heart_disease['Sex'][0], '\n', heart_disease['Sex'].describe())
-print('\nChest Pain Type: \n Sample data: ', heart_disease['ChestPainType'][0], '\n', heart_disease['ChestPainType'].describe())
-print('\nResting Blood Pressure: \n Sample data: ', heart_disease['RestingBP'][0], '\n', heart_disease['RestingBP'].describe())
-print('\nCholesterol: \n Sample data: ', heart_disease['Cholesterol'][0], '\n', heart_disease['Cholesterol'].describe())
-print('\nFasting Blood Sugar: \n Sample data: ', heart_disease['FastingBS'][0], '\n', heart_disease['FastingBS'].describe())
-print('\nResting ECG: \n Sample data: ', heart_disease['RestingECG'][0], '\n', heart_disease['RestingECG'].describe())
-print('\nMax Heart Rate: \n Sample data: ', heart_disease['MaxHR'][0], '\n', heart_disease['MaxHR'].describe())
-print('\nExercise Angina: \n Sample data: ', heart_disease['ExerciseAngina'][0], '\n', heart_disease['ExerciseAngina'].describe())
-print('\nOldpeak: \n Sample data: ', heart_disease['Oldpeak'][0], '\n', heart_disease['Oldpeak'].describe())
-print('\nST Slope: \n Sample data: ', heart_disease['ST_Slope'][0], '\n', heart_disease['ST_Slope'].describe())
-print('\nHeart Disease: \n Sample data: ', heart_disease['HeartDisease'][0], '\n', heart_disease['HeartDisease'].describe())
-
+describe_all(heart_disease)
 
 ##------------------------------------------
 # Step 3 - Cleaning and Formatting the data
 ##------------------------------------------
 
 # Convert Fasting Blood Sugar from numerical to categorical (1 = True, 0 = False)
-heart_disease['FastingBS'] = heart_disease['FastingBS'].astype('category')
-assert heart_disease['FastingBS'].dtype == 'category'
-print('\nRevised Fasting Blood Sugar: \n Sample data: ', heart_disease['FastingBS'][0], '\n', heart_disease['FastingBS'].describe())
+heart_disease['FastingBS'] = heart_disease['FastingBS'].astype('object')
+assert heart_disease['FastingBS'].dtype == 'object'
+
 
 # Convert Heart Disease from numerical to categorical (1 = True, 0 = False)
-heart_disease['HeartDisease'] = heart_disease['HeartDisease'].astype('category')
-assert heart_disease['HeartDisease'].dtype == 'category'
-print('\nHeart Disease: \n Sample data: ', heart_disease['HeartDisease'][0], '\n', heart_disease['HeartDisease'].describe())
+heart_disease['HeartDisease'] = heart_disease['HeartDisease'].astype('object')
+assert heart_disease['HeartDisease'].dtype == 'object'
+
 
 # Check for any Missing Values (NaN)
 print('\nIDENTIFY MISSING VALUES: \n', heart_disease.isnull().sum(), '')
@@ -55,6 +45,20 @@ print('\nIDENTIFY MISSING VALUES: \n', heart_disease.isnull().sum(), '')
 # Remove duplicates and re-chack shape
 heart_disease.drop_duplicates(inplace=True)
 print('\nDATA SHAPE AFTER REMOVING DUPLICATES: \n', heart_disease.shape, '')
+
+# Look closer at Cholesterol values - min value = 0 doesn't make sense
+print(heart_disease['Cholesterol'].value_counts().sort_index())
+heart_disease['Cholesterol'].replace([0],np.nan, inplace=True)
+
+describe_all(heart_disease)
+
+
+sns.boxplot(x="Sex", hue="HeartDisease", y="Cholesterol", data=heart_disease)
+# adding a title to the plot:
+plt.title('Renme', fontsize=14)
+# displaying the plot:
+plt.show()
+
 
 
 
