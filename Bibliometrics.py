@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from scipy.stats import boxcox
+import requests
 
 
 
@@ -103,6 +104,7 @@ _ = plt.plot(x_fwci, y_fwci, marker = '.', linestyle = 'none')
 # Label the axes
 _ = plt.xlabel('FWCI')
 _ = plt.ylabel('ECDF')
+_ = plt.title('ECDF')
 
 
 # Display the plot
@@ -114,34 +116,74 @@ publications['bc_fwci'] = boxcox(publications['Field-Weighted Citation Impact']+
 _ = plt.scatter(x="Year", y='bc_fwci', data = publications)
 _ = plt.xlabel('Year')
 _ = plt.ylabel('Bco_Cox FWCI')
+_ = plt.title('BOXCOX TRANSFORM')
 plt.show()
 
 sns.boxplot(x='Year', y='Field-Weighted Citation Impact', data=publications, whis=10)
 plt.yscale('log')
+plt.title('LOG TRANSFORM')
 plt.show()
 
-###### ONLY SELECT ARTICLE, REVIEW, CONFERENCE PAPER, CHAPTER, BOOK
-
-#print(publications.isnull().sum())
+# FWCI BY INTERNATIONAL COLLABORATIONS
 _ = sns.boxplot(x="Field-Weighted Citation Impact", y="International collab", data = publications)
-#_ = sns.boxplot(data=publications, x='Year', y='Field-Weighted Citation Impact')
 _ = plt.xlabel('FWCI')
+_ = plt.title('FWCI BY INTERNATIONAL COLLABORATIONS')
 plt.show()
 
-def normalize(column):
+# Create function to normalize data
+def normalize_minmax(column):
     upper = column.max()
     lower = column.min()
     y = (column - lower)/(upper-lower)
     return y
 
-# FWCI data highly skewed - try normalise using log (plus 1 to avoid zero divisor)
+# FWCI data highly skewed - try normalise the log (plus 1 to avoid zero divisor)
 publications['FWCI_log'] = np.log(publications['Field-Weighted Citation Impact']+1)
-publications['FWCI_log_normalized'] = normalize(publications['FWCI_log'])
+publications['FWCI_log_normalized'] = normalize_minmax(publications['FWCI_log'])
 print(publications['FWCI_log_normalized'].describe())
 
+# histogram of untransformed FWCI
+_ = plt.hist(publications['Field-Weighted Citation Impact'], bins=20)
+_ = plt.xlabel('FWCI')
+_ = plt.title('FWCI UNTRANSFORMED')
+plt.show()
+
+# boxplot of untransformed FWCI
+_ = sns.boxplot(x='Year', y='Field-Weighted Citation Impact', data=publications, whis=10)
+_ = plt.title('FWCI BY YEAR - UNTRANSFORMED')
+plt.show()
+
+# histogram of boxcox transformed FWCI
 _ = plt.hist(publications['bc_fwci'], bins=20)
 _ = plt.xlabel('bc_FWCI')
-_ = plt.ylabel('No. of publications')
+_ = plt.title('FWCI BOXCOX TRANSFORM')
+plt.show()
+
+# boxplot of boxcox transformed FWCI
+_ = sns.boxplot(x='Year', y='bc_fwci', data=publications, whis=10)
+_ = plt.title('FWCI BY YEAR - BOXCOX TRANSFORM')
+plt.show()
+
+# histogram of log transformed FWCI
+_ = plt.hist(publications['FWCI_log'], bins=20)
+_ = plt.xlabel('FWCI_log')
+_ = plt.title('FWCI LOG TRANSFORMED')
+plt.show()
+
+# boxplot of log transformed FWCI
+_ = sns.boxplot(x='Year', y='FWCI_log', data=publications, whis=10)
+_ = plt.title('FWCI BY YEAR - LOG TRANSFORM')
+plt.show()
+
+# histogram of log transformed and normalized FWCI
+_ = plt.hist(publications['FWCI_log_normalized'], bins=20)
+_ = plt.xlabel('FWCI_log_normalized')
+_ = plt.title('FWCI LOG TRANSFORMED AND NORMALIZED')
+plt.show()
+
+# boxplot of log transformed and normalized FWCI
+_ = sns.boxplot(x='Year', y='FWCI_log_normalized', data=publications, whis=10)
+_ = plt.title('FWCI BY YEAR - LOG TRANSFORMED AND NORMALIZED')
 plt.show()
 
 _ = plt.scatter(x="Year", y='Field-Weighted Citation Impact', data = publications)
@@ -165,3 +207,19 @@ plt.show()
 heart_pubs = publications[publications['Title'].str.contains(".*[Hh]eart\s[Dd]isease.*")==True]
 print(f"Publications on Heart Disease:\n{heart_pubs.shape}")
 print(heart_pubs.head())
+
+most_highly_cited = heart_pubs.nlargest(1,'Field-Weighted Citation Impact')
+#print((most_highly_cited['EID']))
+print(f"Most highly cited: \n{most_highly_cited['EID'].values}")
+
+# Use API to find out what journal the most highly cited article is in
+response = requests.get(f"https://api.elsevier.com/content/search/index:SCOPUS?query=EID({most_highly_cited['EID'].values})&apikey=c07cc535c7166b6ea26203bdd9f72fb3")
+output = response.json()
+data = pd.DataFrame(output)
+pd.options.display.width= None
+pd.options.display.max_columns= None
+print (data.shape)
+
+print(data['search-results'].head())
+print(data['search-results'][0][0].keys())
+print(f"The most highly cited article is available in {data['search-results'][0][0]['prism:publicationName']}")
