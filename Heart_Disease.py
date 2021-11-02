@@ -1,6 +1,6 @@
 ## UCDPA PROJECT - LISA MURPHY
 
-## Step 1 - Importing relevant Python libraries for analysis
+### Import relevant Python libraries for analysis
 
 import pandas as pd
 import matplotlib.pyplot as plt

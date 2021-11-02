@@ -213,7 +213,8 @@ most_highly_cited = heart_pubs.nlargest(1,'Field-Weighted Citation Impact')
 print(f"Most highly cited: \n{most_highly_cited['EID'].values}")
 
 # Use API to find out what journal the most highly cited article is in
-response = requests.get(f"https://api.elsevier.com/content/search/index:SCOPUS?query=EID({most_highly_cited['EID'].values})&apikey=c07cc535c7166b6ea26203bdd9f72fb3")
+# API key obscured due to proprietary access to api
+response = requests.get(f"https://api.elsevier.com/content/search/index:SCOPUS?query=EID({most_highly_cited['EID'].values})&apikey=xxxxxxx")
 output = response.json()
 data = pd.DataFrame(output)
 pd.options.display.width= None
