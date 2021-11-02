@@ -220,6 +220,9 @@ pd.options.display.width= None
 pd.options.display.max_columns= None
 print (data.shape)
 
+# get an understanding of the data structure
 print(data['search-results'].head())
 print(data['search-results'][0][0].keys())
+
+# Print where you can find the most cited Irish article in relation to Heart Disease
 print(f"The most highly cited article is available in {data['search-results'][0][0]['prism:publicationName']}")

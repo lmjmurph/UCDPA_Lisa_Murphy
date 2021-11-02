@@ -203,6 +203,7 @@ X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.3,random_sta
 scaler = MinMaxScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.fit_transform(X_test)
+print("X_train type: ",type(X_train))
 
 #_______________________________________
 # Create function to run models and tune hyper parameters
