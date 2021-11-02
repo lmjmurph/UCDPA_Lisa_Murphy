@@ -191,9 +191,6 @@ _ = plt.xlabel('Year')
 _ = plt.ylabel('FWCI')
 plt.show()
 
-
-
-
 # Chart 1 - Visualizing FWCI by year
 # creating the violin plot using seaborn (alias as sns) with FWCI on y-axis
 sns.violinplot(x="Industry Collaboration", y="FWCI_log", data=publications,palette='rainbow')
@@ -215,7 +212,7 @@ print(f"Most highly cited: \n{most_highly_cited['EID'].values}")
 # Use API to find out what journal the most highly cited article is in
 # API key obscured due to proprietary access to api
 # output copied to report
-response = requests.get(f"https://api.elsevier.com/content/search/index:SCOPUS?query=EID({most_highly_cited['EID'].values})&apikey=c07cc535c7166b6ea26203bdd9f72fb3")
+response = requests.get(f"https://api.elsevier.com/content/search/index:SCOPUS?query=EID({most_highly_cited['EID'].values})&apikey=xxxx")
 output = response.json()
 data = pd.DataFrame(output)
 pd.options.display.width= None
